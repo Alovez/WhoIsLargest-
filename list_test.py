@@ -1,26 +1,23 @@
 from tkinter import *
 
 class GroupItem:
-    def __init__(self, row, column, parent, text):
-        self.row = row
-        self.column = column
+    def __init__(self, level, parent, text):
+        self.level = level
         self.parent = parent
         self.text = text
         self.open = False
+        # bm = PhotoImage(file='./img/Close_Folder.png')
         self.widget = Label(parent, text=text)
+        self.sub_list = []
 
     def set_pos(self, row, column):
-        self.row = row
-        self.column = column
         self.widget.grid(row=row, column=column)
 
-    def set_pos_delta(self, d_row, d_column):
-        self.row += d_row
-        self.column += d_column
-        self.widget.grid(row=self.row, column=self.column)
+    def add_sub_item(self, sub_item):
+        self.sub_list.append(sub_item)
 
-    def add_sub_item(self, sub_list):
-        self.sub_list = sub_list
+    def remove_sub_list(self):
+        self.sub_list = []
 
 
 class MoreItem:
@@ -36,34 +33,32 @@ class MoreItem:
         t_label = Label(self.explore, text='test')
         t_label.grid(row=1)
         for i in range(1,10):
-            label = GroupItem(i, 1, self.group, 'Item %s' % i)
-            label.set_pos(i, 1)
+            label = GroupItem(1, self.group, 'item %s' % i)
             label.widget.bind("<Button-1>", self.add_subitem)
             self.label_dict[label.widget] = label
             self.label_list.append(label)
+        self.refresh()
         mainloop()
+
+    def refresh(self):
+        for item in self.label_list:
+            item.set_pos(self.label_list.index(item) + 1, item.level)
 
     def add_subitem(self, event):
         p_label = self.label_dict[event.widget]
         p_num = self.label_list.index(p_label)
         if not p_label.open:
-            if p_num < len(self.label_list):
-                for p_item in self.label_list[p_num + 1:]:
-                    p_item.set_pos_delta(len(self.sub_list),0)
-            sub_label_list = []
             for item in self.sub_list:
-                label = Label(self.group, text=item)
-                label.grid(row=p_label.row + 1 + self.sub_list.index(item), column = p_label.column + 1)
-                sub_label_list.append(label)
-            p_label.add_sub_item(sub_label_list)
+                label = GroupItem(p_label.level + 1, self.group, item)
+                p_label.add_sub_item(label)
+                self.label_list.insert(p_num + 1, label)
             p_label.open = True
         else:
-            if p_num < len(self.label_list):
-                for p_item in self.label_list[p_num + 1:]:
-                    p_item.set_pos_delta(-len(self.sub_list),0)
             for item in p_label.sub_list:
-                item.grid_remove()
+                item.widget.grid_remove()
+                self.label_list.remove(item)
+            p_label.remove_sub_list()
             p_label.open = False
-
+        self.refresh()
 
 MoreItem()
