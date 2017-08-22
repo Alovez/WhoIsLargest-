@@ -16,12 +16,17 @@ class GroupItem:
 class MoreItem:
     def __init__(self):
         self.master = Tk()
-        self.master.geometry('500x300+500+200')
+        self.master.geometry('800x500+500+200')
         self.master.resizable(False, False)
-        self.group = Listbox(self.master)
-        self.group.grid(row=1, column=1,padx=15, pady=15)
+        self.frame_left = LabelFrame(self.master, text="Group", padx=5, pady=5)
+        scrollbar = Scrollbar(self.frame_left)
+        scrollbar.pack(side=RIGHT, fill=Y)
+        self.group = Listbox(self.frame_left, yscrollcommand=scrollbar.set, height=24)
+        self.group.pack(side=LEFT, fill=BOTH)
+        scrollbar.config(command=self.group.yview)
+        self.frame_left.grid(row=1, column=1,padx=15, pady=15)
         self.explore = LabelFrame(self.master, text="Explore", padx=20, pady=15)
-        self.explore.grid(row=1, column=2, padx=15, pady=15)
+        self.explore.grid(row=1, column=3, padx=15, pady=15)
         self.label_list = []
         self.text_list = []
         self.sub_list = ['sub1', 'sub2']
