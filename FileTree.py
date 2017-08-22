@@ -19,7 +19,7 @@ class FileTreeNode:
         self.children.append(child_node)
 
     def get_children(self):
-        return copy.copy(self.children)
+        return self.children
 
     def get_size(self):
         size = 0

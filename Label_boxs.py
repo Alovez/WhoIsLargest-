@@ -4,9 +4,10 @@ from tkinter import *
 
 
 class GroupItem:
-    def __init__(self, text, level):
+    def __init__(self, text, level, nodes=None):
         self.text = text
         self.level = level
+        self.nodes = nodes
         self.sub = []
         self.sign = ' > '
         self.open = False
