@@ -5,10 +5,11 @@ class GroupItem:
         self.text = text
         self.level = level
         self.sub = []
+        self.sign = ' > '
         self.open = False
 
     def get_text(self):
-        return '    ' * self.level + self.text
+        return '        ' * self.level + self.sign + self.text
 
     def remove_sub(self):
         self.sub = []
@@ -57,11 +58,13 @@ class MoreItem:
                 self.label_list.insert(index + 1, label)
                 p_label.sub.append(label)
             p_label.open = True
+            p_label.sign = ' ▼ '
         else:
             for label in p_label.sub:
                 self.label_list.remove(label)
             p_label.remove_sub()
             p_label.open = False
+            p_label.sign = ' > '
         self.refresh()
 
         # p_label = self.label_dict[event.widget]
