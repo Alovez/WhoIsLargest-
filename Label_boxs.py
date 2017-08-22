@@ -1,4 +1,7 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 from tkinter import *
+
 
 class GroupItem:
     def __init__(self, text, level):
@@ -11,45 +14,67 @@ class GroupItem:
     def get_text(self):
         return '        ' * self.level + self.sign + self.text
 
-    def remove_sub(self):
-        self.sub = []
+    def remove_sub(self, label_list):
+        if len(self.sub) == 0:
+            return
+        else:
+            for item in self.sub:
+                label_list.remove(item)
+                item.remove_sub(label_list)
+            self.sub = []
+
 
 class MoreItem:
     def __init__(self):
+        # 初始化窗口
         self.master = Tk()
-        self.master.geometry('800x500+500+200')
+        self.master.geometry('840x500+500+200')
         self.master.resizable(False, False)
+        # 初始化左边栏
         self.frame_left = LabelFrame(self.master, text="Group", padx=5, pady=5)
         scrollbar = Scrollbar(self.frame_left)
         scrollbar.pack(side=RIGHT, fill=Y)
         self.group = Listbox(self.frame_left, yscrollcommand=scrollbar.set, height=24)
         self.group.pack(side=LEFT, fill=BOTH)
         scrollbar.config(command=self.group.yview)
-        self.frame_left.grid(row=1, column=1,padx=15, pady=15)
-        self.explore = LabelFrame(self.master, text="Explore", padx=20, pady=15)
-        self.explore.grid(row=1, column=3, padx=15, pady=15)
+        self.frame_left.grid(row=1, column=1, padx=15, pady=15)
         self.label_list = []
         self.text_list = []
         self.sub_list = ['sub1', 'sub2']
-        t_label = Label(self.explore, text='test')
-        t_label.grid(row=1)
-        for i in range(1,10):
+        for i in range(1, 10):
             label = GroupItem('item %s' % i, 0)
             self.label_list.append(label)
             self.text_list.append(label.get_text())
-        self.group.bind("<<ListboxSelect>>", self.add_subitem)
+        self.group.bind("<<ListboxSelect>>", self.show_sub)
         self.val = StringVar(value=self.text_list)
         self.group['listvariable'] = self.val
-        self.refresh()
+        self.refresh_left()
+        # 初始化右边栏
+        self.frame_right = LabelFrame(self.master, text="Explore", padx=5, pady=5)
+        self.frame_right.grid(row=1, column=2, padx=15, pady=15, sticky='N')
+        self.name_button = Button(self.frame_right, text='名称', width=25)
+        self.size_button = Button(self.frame_right, text='大小', width=30)
+        self.type_button = Button(self.frame_right, text='类型', width=25)
+        self.name_button.grid(row=1, column=1)
+        self.type_button.grid(row=1, column=2)
+        self.size_button.grid(row=1, column=3)
+        self.explore_frame = Frame(self.frame_right, padx=5, pady=5)
+        self.explore_frame.grid(row=2, columnspan=4)
+        explore_scroll = Scrollbar(self.explore_frame)
+        explore_scroll.pack(side=RIGHT, fill=Y)
+        self.explore = Listbox(self.explore_frame, yscrollcommand=explore_scroll, height=22, width=80)
+        self.explore.pack(side=LEFT, fill=BOTH)
+        explore_scroll.config(command=self.explore.yview)
+
         mainloop()
 
-    def refresh(self):
+    def refresh_left(self):
         self.text_list = []
         for item in self.label_list:
             self.text_list.append(item.get_text())
         self.val.set(tuple(self.text_list))
 
-    def add_subitem(self, event):
+    def show_sub(self, event):
         index = self.group.curselection()[0]
         p_label = self.label_list[index]
         if not p_label.open:
@@ -60,12 +85,10 @@ class MoreItem:
             p_label.open = True
             p_label.sign = ' ▼ '
         else:
-            for label in p_label.sub:
-                self.label_list.remove(label)
-            p_label.remove_sub()
+            p_label.remove_sub(self.label_list)
             p_label.open = False
             p_label.sign = ' > '
-        self.refresh()
+        self.refresh_left()
 
         # p_label = self.label_dict[event.widget]
         # p_num = self.label_list.index(p_label)
@@ -81,6 +104,7 @@ class MoreItem:
         #         self.label_list.remove(item)
         #     p_label.remove_sub_list()
         #     p_label.open = False
-        # self.refresh()
+        # self.refresh_left()
+
 
 MoreItem()
