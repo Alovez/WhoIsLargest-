@@ -23,6 +23,8 @@ class GroupItem:
 class MoreItem:
     def __init__(self):
         self.master = Tk()
+        self.master.geometry('500x300+500+200')
+        self.master.resizable(False, False)
         self.group = LabelFrame(self.master, text="Group", padx=20, pady=15)
         self.group.grid(row=1, column=1,padx=15, pady=15)
         self.explore = LabelFrame(self.master, text="Explore", padx=20, pady=15)
