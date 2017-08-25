@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from tkinter import *
+from disk_info import disk, create_node_tree, save_node_tree
 
 
 class GroupItem:
