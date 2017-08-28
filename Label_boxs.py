@@ -5,13 +5,23 @@ from disk_info import disk, create_node_tree, save_node_tree
 
 
 class GroupItem:
-    def __init__(self, text, level, nodes=None):
+    def __init__(self, text, level, node=None):
         self.text = text
         self.level = level
-        self.nodes = nodes
+        self.node = node
         self.sub = []
         self.sign = ' > '
         self.open = False
+
+    def get_sub_text_list_from_nodes(self):
+        sub_nodes = self.node.get_children_dir()
+        sub_text_list = []
+        for node in sub_nodes:
+            sub_text_list.append(node.name)
+        return sub_text_list
+
+    def get_children_dir(self):
+        return self.node.get_children_dir()
 
     def get_text(self):
         return '        ' * self.level + self.sign + self.text
@@ -27,7 +37,7 @@ class GroupItem:
 
 
 class MoreItem:
-    def __init__(self):
+    def __init__(self, root_nodes):
         # 初始化窗口
         self.master = Tk()
         self.master.geometry('840x500+500+200')
@@ -36,15 +46,17 @@ class MoreItem:
         self.frame_left = LabelFrame(self.master, text="Group", padx=5, pady=5)
         scrollbar = Scrollbar(self.frame_left)
         scrollbar.pack(side=RIGHT, fill=Y)
-        self.group = Listbox(self.frame_left, yscrollcommand=scrollbar.set, height=24)
+        scrollbar_b = Scrollbar(self.frame_left, orient=HORIZONTAL)
+        scrollbar_b.pack(side=BOTTOM, fill=X)
+        self.group = Listbox(self.frame_left, yscrollcommand=scrollbar.set, xscrollcommand=scrollbar_b.set, height=24)
         self.group.pack(side=LEFT, fill=BOTH)
         scrollbar.config(command=self.group.yview)
+        scrollbar_b.config(command=self.group.xview)
         self.frame_left.grid(row=1, column=1, padx=15, pady=15)
         self.label_list = []
         self.text_list = []
-        self.sub_list = ['sub1', 'sub2']
-        for i in range(1, 10):
-            label = GroupItem('item %s' % i, 0)
+        for root in root_nodes:
+            label = GroupItem(root.name, 0, root)
             self.label_list.append(label)
             self.text_list.append(label.get_text())
         self.group.bind("<<ListboxSelect>>", self.show_sub)
@@ -80,8 +92,8 @@ class MoreItem:
         index = self.group.curselection()[0]
         p_label = self.label_list[index]
         if not p_label.open:
-            for item in self.sub_list:
-                label = GroupItem(item, p_label.level + 1)
+            for item in p_label.get_children_dir():
+                label = GroupItem(item.name, p_label.level + 1, item)
                 self.label_list.insert(index + 1, label)
                 p_label.sub.append(label)
             p_label.open = True
@@ -107,6 +119,3 @@ class MoreItem:
         #     p_label.remove_sub_list()
         #     p_label.open = False
         # self.refresh_left()
-
-
-MoreItem()

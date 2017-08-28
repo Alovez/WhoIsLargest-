@@ -21,6 +21,26 @@ def disk():
                     Volume_list.append(name.strip())
     return Volume_list
 
+def load_node_tree(tree_json, p_node=None):
+    name = tree_json.get('name')
+    type = tree_json.get('type')
+    is_dir = bool(tree_json.get('is_dir'))
+    m_time = tree_json.get('m_time')
+    path = tree_json.get('path')
+    size = tree_json.get('size')
+    sub_node = FileTreeNode(name, type, is_dir, m_time, path, size)
+    sub_node.is_init = True
+    if is_dir:
+        children_dict = tree_json.get('children_dict')
+        for child in children_dict:
+            load_node_tree(child, sub_node)
+    if p_node is None:
+        p_node = sub_node
+    else:
+        p_node.add_child(sub_node)
+    return p_node
+
+
 def create_node_tree(p_node):
     try:
         path_list = os.listdir(p_node.path)
@@ -52,14 +72,14 @@ def save_node_tree(p_node):
 
 
 
-v_list = disk()
-trees = []
-
-for v in v_list:
-    tree_root = FileTreeNode(v, 'volume', os.path.isdir(v), None, path=v)
-    create_node_tree(tree_root)
-    print(tree_root.get_size())
-    save_node_tree(tree_root)
+# v_list = disk()
+# trees = []
+#
+# for v in v_list:
+#     tree_root = FileTreeNode(v, 'volume', os.path.isdir(v), None, path=v)
+#     create_node_tree(tree_root)
+#     print(tree_root.get_size())
+#     save_node_tree(tree_root)
 # v = 'D:/'
 # tree_root = FileTreeNode(v, 'volume', os.path.isdir(v), None, path=v)
 # create_node_tree(tree_root)

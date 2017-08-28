@@ -28,6 +28,13 @@ class FileTreeNode:
     def get_children(self):
         return self.children
 
+    def get_children_dir(self):
+        children_dir = []
+        for child in self.get_children():
+            if child.is_dir:
+                children_dir.append(child)
+        return children_dir
+
     def get_children_tree(self):
         child_save_tree = []
         for child in self.get_children():
